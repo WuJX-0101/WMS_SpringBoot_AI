@@ -115,12 +115,36 @@
         </el-card>
       </el-col>
     </el-row>
+
+    <el-row :gutter="20" style="margin-top: 20px">
+      <el-col :span="24">
+        <el-card>
+          <template #header>
+            <div class="card-header">
+              <span>ES 数据同步</span>
+              <el-tag type="info" size="small">运维工具</el-tag>
+            </div>
+          </template>
+          <div class="sync-section">
+            <el-button type="primary" :loading="syncLoading.all" @click="handleSync('all')">
+              全量同步所有数据
+            </el-button>
+            <el-divider direction="vertical" />
+            <el-button :loading="syncLoading.products" @click="handleSync('products')">同步商品</el-button>
+            <el-button :loading="syncLoading.suppliers" @click="handleSync('suppliers')">同步供应商</el-button>
+            <el-button :loading="syncLoading.customers" @click="handleSync('customers')">同步客户</el-button>
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { getDashboardStats } from '@/api/dashboard'
+import { syncAll, syncProducts, syncSuppliers, syncCustomers } from '@/api/search'
 
 // 统计数据
 const stats = reactive({
@@ -141,6 +165,28 @@ const recentOutbound = ref<any[]>([])
 
 // 加载状态
 const loading = ref(false)
+
+// ES 同步加载状态
+const syncLoading = reactive({
+  all: false,
+  products: false,
+  suppliers: false,
+  customers: false
+})
+
+// ES 同步处理
+const handleSync = async (type: 'all' | 'products' | 'suppliers' | 'customers') => {
+  syncLoading[type] = true
+  try {
+    const apiMap = { all: syncAll, products: syncProducts, suppliers: syncSuppliers, customers: syncCustomers }
+    const res: any = await apiMap[type]()
+    ElMessage.success(res.message || '同步成功')
+  } catch (error: any) {
+    ElMessage.error(error.message || '同步失败')
+  } finally {
+    syncLoading[type] = false
+  }
+}
 
 // 加载数据
 const loadData = async () => {
@@ -247,5 +293,11 @@ onMounted(() => {
   font-size: 28px;
   font-weight: bold;
   color: #303133;
+}
+
+.sync-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

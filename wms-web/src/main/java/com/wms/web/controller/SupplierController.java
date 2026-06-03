@@ -4,6 +4,8 @@ import com.wms.common.core.PageResult;
 import com.wms.common.core.R;
 import com.wms.model.dto.SupplierDTO;
 import com.wms.model.entity.WmsSupplier;
+import com.wms.model.document.SupplierDocument;
+import com.wms.service.SearchService;
 import com.wms.service.SupplierService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +27,7 @@ import java.util.List;
 public class SupplierController {
 
     private final SupplierService supplierService;
+    private final SearchService searchService;
 
     /**
      * 创建供应商
@@ -91,6 +94,20 @@ public class SupplierController {
     @SaCheckPermission("supplier:view")
     public R<List<WmsSupplier>> listAll() {
         List<WmsSupplier> result = supplierService.listAll();
+        return R.ok(result);
+    }
+
+    /**
+     * ES 全文搜索供应商
+     */
+    @Operation(summary = "全文搜索供应商")
+    @GetMapping("/search")
+    @SaCheckPermission("supplier:view")
+    public R<PageResult<SupplierDocument>> search(
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "搜索关键词") @RequestParam String keyword) {
+        PageResult<SupplierDocument> result = searchService.searchSuppliers(keyword, page, size);
         return R.ok(result);
     }
 }

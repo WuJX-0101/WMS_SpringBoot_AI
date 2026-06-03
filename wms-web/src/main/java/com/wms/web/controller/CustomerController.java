@@ -4,7 +4,9 @@ import com.wms.common.core.PageResult;
 import com.wms.common.core.R;
 import com.wms.model.dto.CustomerDTO;
 import com.wms.model.entity.WmsCustomer;
+import com.wms.model.document.CustomerDocument;
 import com.wms.service.CustomerService;
+import com.wms.service.SearchService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,6 +27,7 @@ import java.util.List;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final SearchService searchService;
 
     /**
      * 创建客户
@@ -91,6 +94,20 @@ public class CustomerController {
     @SaCheckPermission("customer:view")
     public R<List<WmsCustomer>> listAll() {
         List<WmsCustomer> result = customerService.listAll();
+        return R.ok(result);
+    }
+
+    /**
+     * ES 全文搜索客户
+     */
+    @Operation(summary = "全文搜索客户")
+    @GetMapping("/search")
+    @SaCheckPermission("customer:view")
+    public R<PageResult<CustomerDocument>> search(
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "搜索关键词") @RequestParam String keyword) {
+        PageResult<CustomerDocument> result = searchService.searchCustomers(keyword, page, size);
         return R.ok(result);
     }
 }

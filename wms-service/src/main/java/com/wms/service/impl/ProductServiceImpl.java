@@ -11,6 +11,7 @@ import com.wms.model.entity.WmsCategory;
 import com.wms.model.entity.WmsProduct;
 import com.wms.model.vo.ProductVO;
 import com.wms.service.ProductService;
+import com.wms.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +33,7 @@ public class ProductServiceImpl implements ProductService {
 
     private final WmsProductMapper productMapper;
     private final WmsCategoryMapper categoryMapper;
+    private final SearchService searchService;
 
     /**
      * 创建商品
@@ -72,6 +74,10 @@ public class ProductServiceImpl implements ProductService {
         // 4. 插入数据库
         productMapper.insert(product);
         log.info("创建商品成功: {}", product.getProductCode());
+
+        // 5. 同步 ES 索引
+        searchService.indexProduct(product);
+
         return product;
     }
 
@@ -119,6 +125,10 @@ public class ProductServiceImpl implements ProductService {
         BeanUtils.copyProperties(dto, product);
         productMapper.updateById(product);
         log.info("更新商品成功: {}", product.getProductCode());
+
+        // 5. 同步 ES 索引
+        searchService.indexProduct(product);
+
         return product;
     }
 
@@ -134,6 +144,9 @@ public class ProductServiceImpl implements ProductService {
         }
         productMapper.deleteById(id);
         log.info("删除商品成功: {}", product.getProductCode());
+
+        // 同步删除 ES 索引
+        searchService.deleteProductIndex(id);
     }
 
     /**

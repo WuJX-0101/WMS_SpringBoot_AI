@@ -5,7 +5,9 @@ import com.wms.common.core.R;
 import com.wms.model.dto.ProductDTO;
 import com.wms.model.entity.WmsProduct;
 import com.wms.model.vo.ProductVO;
+import com.wms.model.document.ProductDocument;
 import com.wms.service.ProductService;
+import com.wms.service.SearchService;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductController {
 
     private final ProductService productService;
+    private final SearchService searchService;
 
     /**
      * 创建商品
@@ -82,6 +85,20 @@ public class ProductController {
             @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
             @Parameter(description = "关键词") @RequestParam(required = false) String keyword) {
         PageResult<ProductVO> result = productService.list(page, size, keyword);
+        return R.ok(result);
+    }
+
+    /**
+     * ES 全文搜索商品
+     */
+    @Operation(summary = "全文搜索商品")
+    @GetMapping("/search")
+    @SaCheckPermission("product:view")
+    public R<PageResult<ProductDocument>> search(
+            @Parameter(description = "页码") @RequestParam(defaultValue = "1") int page,
+            @Parameter(description = "每页数量") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "搜索关键词") @RequestParam String keyword) {
+        PageResult<ProductDocument> result = searchService.searchProducts(keyword, page, size);
         return R.ok(result);
     }
 }

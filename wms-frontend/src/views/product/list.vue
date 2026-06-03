@@ -94,7 +94,7 @@ import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'elem
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import StatusTag from '@/components/StatusTag.vue'
-import { listProduct, createProduct, updateProduct, deleteProduct } from '@/api/product'
+import { listProduct, searchProduct, createProduct, updateProduct, deleteProduct } from '@/api/product'
 import { getCategoryTree } from '@/api/category'
 
 const loading = ref(false)
@@ -138,11 +138,8 @@ const loadCategoryTree = async () => {
 const handleSearch = async () => {
   loading.value = true
   try {
-    const res: any = await listProduct({
-      page: pagination.page,
-      size: pagination.size,
-      keyword: searchForm.keyword
-    })
+    const params = { page: pagination.page, size: pagination.size, keyword: searchForm.keyword }
+    const res: any = searchForm.keyword ? await searchProduct(params) : await listProduct(params)
     tableData.value = res.data.records
     pagination.total = res.data.total
   } finally {

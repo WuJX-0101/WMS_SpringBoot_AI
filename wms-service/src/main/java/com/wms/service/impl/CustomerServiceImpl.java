@@ -8,6 +8,7 @@ import com.wms.dao.mapper.WmsCustomerMapper;
 import com.wms.model.dto.CustomerDTO;
 import com.wms.model.entity.WmsCustomer;
 import com.wms.service.CustomerService;
+import com.wms.service.SearchService;
 
 import java.util.List;
 import com.wms.service.config.CacheConfig;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
 public class CustomerServiceImpl implements CustomerService {
 
     private final WmsCustomerMapper customerMapper;
+    private final SearchService searchService;
 
     /**
      * 创建客户
@@ -58,6 +60,10 @@ public class CustomerServiceImpl implements CustomerService {
         // 3. 插入数据库
         customerMapper.insert(customer);
         log.info("创建客户成功: {}", customer.getCustomerCode());
+
+        // 4. 同步 ES 索引
+        searchService.indexCustomer(customer);
+
         return customer;
     }
 
@@ -93,6 +99,10 @@ public class CustomerServiceImpl implements CustomerService {
         BeanUtils.copyProperties(dto, customer);
         customerMapper.updateById(customer);
         log.info("更新客户成功: {}", customer.getCustomerCode());
+
+        // 4. 同步 ES 索引
+        searchService.indexCustomer(customer);
+
         return customer;
     }
 
@@ -109,6 +119,9 @@ public class CustomerServiceImpl implements CustomerService {
         }
         customerMapper.deleteById(id);
         log.info("删除客户成功: {}", customer.getCustomerCode());
+
+        // 同步删除 ES 索引
+        searchService.deleteCustomerIndex(id);
     }
 
     /**

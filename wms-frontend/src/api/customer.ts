@@ -4,6 +4,10 @@ export function listCustomer(params: { page?: number; size?: number; keyword?: s
   return request({ url: '/api/v1/customer/list', method: 'get', params })
 }
 
+export function searchCustomer(params: { page?: number; size?: number; keyword: string }) {
+  return request({ url: '/api/v1/customer/search', method: 'get', params })
+}
+
 /** 获取所有客户（带缓存，用于下拉选择） */
 export function getAllCustomer() {
   return request({ url: '/api/v1/customer/all', method: 'get' })

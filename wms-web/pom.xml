@@ -6,7 +6,7 @@
 
     <parent>
         <groupId>com.wms</groupId>
-        <artifactId>springboot-ai-project</artifactId>
+        <artifactId>WMS</artifactId>
         <version>1.0.0</version>
     </parent>
 
@@ -43,6 +43,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <version>3.2.5</version>
         </dependency>
 
         <dependency>

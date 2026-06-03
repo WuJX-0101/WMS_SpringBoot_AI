@@ -4,6 +4,10 @@ export function listProduct(params: { page?: number; size?: number; keyword?: st
   return request({ url: '/api/v1/product/list', method: 'get', params })
 }
 
+export function searchProduct(params: { page?: number; size?: number; keyword: string }) {
+  return request({ url: '/api/v1/product/search', method: 'get', params })
+}
+
 export function getProduct(id: number) {
   return request({ url: `/api/v1/product/${id}`, method: 'get' })
 }

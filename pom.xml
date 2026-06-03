@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.wms</groupId>
-    <artifactId>springboot-ai-project</artifactId>
+    <artifactId>WMS</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
     <name>仓储物流管理系统</name>
@@ -141,6 +141,11 @@
                 <groupId>com.wms</groupId>
                 <artifactId>wms-integration</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
             </dependency>
         </dependencies>
     </dependencyManagement>

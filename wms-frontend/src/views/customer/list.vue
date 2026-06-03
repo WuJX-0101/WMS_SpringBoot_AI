@@ -86,7 +86,7 @@ import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'elem
 import PageHeader from '@/components/PageHeader.vue'
 import SearchForm from '@/components/SearchForm.vue'
 import StatusTag from '@/components/StatusTag.vue'
-import { listCustomer, createCustomer, updateCustomer, deleteCustomer } from '@/api/customer'
+import { listCustomer, searchCustomer, createCustomer, updateCustomer, deleteCustomer } from '@/api/customer'
 
 const loading = ref(false)
 const submitLoading = ref(false)
@@ -122,11 +122,8 @@ const rules: FormRules = {
 const handleSearch = async () => {
   loading.value = true
   try {
-    const res: any = await listCustomer({
-      page: pagination.page,
-      size: pagination.size,
-      keyword: searchForm.keyword
-    })
+    const params = { page: pagination.page, size: pagination.size, keyword: searchForm.keyword }
+    const res: any = searchForm.keyword ? await searchCustomer(params) : await listCustomer(params)
     tableData.value = res.data.records
     pagination.total = res.data.total
   } finally {

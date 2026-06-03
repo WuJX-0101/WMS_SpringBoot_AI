@@ -7,6 +7,7 @@ import com.wms.common.exception.BusinessException;
 import com.wms.dao.mapper.WmsSupplierMapper;
 import com.wms.model.dto.SupplierDTO;
 import com.wms.model.entity.WmsSupplier;
+import com.wms.service.SearchService;
 import com.wms.service.SupplierService;
 
 import java.util.List;
@@ -29,6 +30,7 @@ import org.springframework.util.StringUtils;
 public class SupplierServiceImpl implements SupplierService {
 
     private final WmsSupplierMapper supplierMapper;
+    private final SearchService searchService;
 
     /**
      * 创建供应商
@@ -58,6 +60,10 @@ public class SupplierServiceImpl implements SupplierService {
         // 3. 插入数据库
         supplierMapper.insert(supplier);
         log.info("创建供应商成功: {}", supplier.getSupplierCode());
+
+        // 4. 同步 ES 索引
+        searchService.indexSupplier(supplier);
+
         return supplier;
     }
 
@@ -93,6 +99,10 @@ public class SupplierServiceImpl implements SupplierService {
         BeanUtils.copyProperties(dto, supplier);
         supplierMapper.updateById(supplier);
         log.info("更新供应商成功: {}", supplier.getSupplierCode());
+
+        // 4. 同步 ES 索引
+        searchService.indexSupplier(supplier);
+
         return supplier;
     }
 
@@ -109,6 +119,9 @@ public class SupplierServiceImpl implements SupplierService {
         }
         supplierMapper.deleteById(id);
         log.info("删除供应商成功: {}", supplier.getSupplierCode());
+
+        // 同步删除 ES 索引
+        searchService.deleteSupplierIndex(id);
     }
 
     /**

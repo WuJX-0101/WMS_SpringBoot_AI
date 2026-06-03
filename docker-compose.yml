@@ -43,6 +43,11 @@ services:
       - elasticsearch_data:/usr/share/elasticsearch/data
     networks:
       - wms-network
+    command: >
+      bash -c '
+        elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/8.13.0 &&
+        exec docker-entrypoint.sh elasticsearch
+      '
 
 volumes:
   mysql_data:
